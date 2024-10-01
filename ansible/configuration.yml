@@ -1,0 +1,15 @@
+- hosts: localhost
+  tasks:
+    - name: Pull the Docker image
+      docker_image:
+        name: my_web_app
+        tag: latest
+        source: pull
+
+    - name: Run the Docker container
+      docker_container:
+        name: my_web_app_container
+        image: my_web_app:latest
+        state: started
+        ports:
+          - "5000:5000"
