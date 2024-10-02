@@ -1,4 +1,4 @@
-- hosts: dev
+- hosts: 43.204.38.42
   become: yes
   tasks:
     - name: Install Docker
