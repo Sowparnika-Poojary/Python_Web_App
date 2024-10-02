@@ -30,6 +30,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "configuration.yml"
           target: "ansible/configuration.yml"
+          port: 22
 
       - name: Run Ansible Playbook
         uses: appleboy/ssh-action@master
