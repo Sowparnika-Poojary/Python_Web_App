@@ -19,7 +19,10 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          registry: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com
+          registry: 211125575280.dkr.ecr.ap-south-1.amazonaws.com
+          mask-password: false
+          registry-type: private
+          skip-logout: false
 
       - name: Build Docker image
         run: |
