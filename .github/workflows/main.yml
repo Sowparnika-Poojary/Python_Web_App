@@ -33,12 +33,18 @@ jobs:
           chmod 700 ~/.ssh/id_ed25519
           ssh-keyscan -H 43.204.38.42 >> ~/.ssh/known_hosts
 
-      - name: Deploy to server
+      # Copy Ansible Playbook and Inventory to the Server
+      - name: Copy Playbook and Inventory
         run: |
-          ssh ubuntu@43.204.38.42
+          scp -o StrictHostKeyChecking=no ansible/configuration.yml ubuntu@43.204.38.42:/tmp/playbook.yml
+          scp -o StrictHostKeyChecking=no ansible/hosts ubuntu@43.204.38.42:/tmp/inventory
 
-      - name: Deploy to Dev using Ansible
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'false'
+      # Run Ansible Playbook on the Server
+      - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i ansible/hosts ansible/configuration.yml --limit dev
+          ssh ubuntu@43.204.38.42 "ansible-playbook -i /tmp/inventory /tmp/playbook.yml"
+
+      - name: Cleanup
+        run: |
+          ssh user@your.dev.server.ip "rm -f /tmp/playbook.yml /tmp/inventory"
+
