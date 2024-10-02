@@ -30,4 +30,4 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'false'
         run: |
-          ansible-playbook -i ansible/hosts ansible/configuration.yml --limit dev --extra-vars "docker_image=sowparnika268/my-python-app:latest"
+          ansible-playbook -i ansible/hosts ansible/configuration.yml --limit dev
