@@ -37,5 +37,5 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'false'
         run: |
-          ansible-playbook -i ansible/hosts.ini ansible/configuration.yml
+          ansible-playbook -i ansible/hosts ansible/configuration.yml
 
