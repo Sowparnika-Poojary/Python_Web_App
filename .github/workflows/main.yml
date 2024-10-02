@@ -1,4 +1,4 @@
-name: Deploy to AWS
+name: Deploy to Docker Hub
 
 on:
   push:
@@ -13,33 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry: 211125575280.dkr.ecr.ap-south-1.amazonaws.com
-          mask-password: false
-          registry-type: private
-          skip-logout: false
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }} .
+        run: docker build -t sowparnika268/my-python-app:latest .
 
-      - name: Tag Docker image
-        run: |
-          docker tag ${{ secrets.ECR_REPOSITORY }}:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
-
-      - name: Push Docker image to ECR
-        run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+      - name: Push Docker image to Docker Hub
+        run: docker push sowparnika268/my-python-app:latest
 
       - name: SSH to Instance and Deploy
         uses: appleboy/scp-action@master
         with:
-          host: 43.204.38.42
+          host: dev
           username: ubuntu  # Change based on your instance user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "configuration.yml"
@@ -48,8 +34,8 @@ jobs:
       - name: Run Ansible Playbook
         uses: appleboy/ssh-action@master
         with:
-          host: 43.204.38.42
+          host: dev
           username: ubuntu  # Change based on your instance user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ansible-playbook ansible/hosts ansible/configuration.yml --extra-vars "ecr_repository=${{ secrets.ECR_REPOSITORY }}"
+            ansible-playbook ansible/hosts ansible/configuration.yml --extra-vars "docker_image=sowparnika268/my-python-app:latest"
