@@ -1,9 +1,9 @@
 - hosts: dev
   become: yes
   tasks:
-    - name: Install Docker
-      package:
-        name: docker
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
         state: present
 
     - name: Pull Docker image
