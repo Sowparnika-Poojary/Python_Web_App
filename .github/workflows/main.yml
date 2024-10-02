@@ -1,37 +1,62 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Run tests
-      run: |
-        # Replace with your test command
-        echo "Running tests..."
+- hosts: dev
+  become: true
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
 
     - name: Build Docker image
-      run: |
-        docker build -t my_web_app .
+      docker_image:
+        path: .
+        name: my-python-app
+        tag: latest
 
-    - name: Deploy with Ansible
-      run: |
-        ansible-playbook ansible/configuration.yml
+    - name: Run Docker container on Dev
+      docker_container:
+        name: my-python-app-dev
+        image: my-python-app:latest
+        state: started
+        restart_policy: always
+
+- hosts: qa
+  become: true
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Pull Docker image
+      docker_image:
+        name: my-python-app
+        tag: latest
+        source: pull
+
+    - name: Run Docker container on QA
+      docker_container:
+        name: my-python-app-qa
+        image: my-python-app:latest
+        state: started
+        restart_policy: always
+
+- hosts: prod
+  become: true
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Pull Docker image
+      docker_image:
+        name: my-python-app
+        tag: latest
+        source: pull
+
+    - name: Run Docker container on Prod
+      docker_container:
+        name: my-python-app-prod
+        image: my-python-app:latest
+        state: started
+        restart_policy: always
