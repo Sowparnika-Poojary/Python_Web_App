@@ -1,9 +1,9 @@
-- hosts: dev
+- hosts: all
   become: yes
   tasks:
     - name: Pull Docker image
       docker_image:
-        name: "{{ ecr_repository }}"
+        name: "{{ docker_image }}"
         tag: latest
         source: pull
 
@@ -15,8 +15,9 @@
     - name: Run container
       docker_container:
         name: my-python-app
-        image: "{{ ecr_repository }}:latest"
+        image: "{{ docker_image }}"
         state: started
         restart_policy: always
         published_ports:
           - "5000:5000"
+
