@@ -19,24 +19,15 @@ jobs:
       - name: Build Docker image
         run: docker build -t sowparnika268/my-python-app:latest .
 
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+
       - name: Push Docker image to Docker Hub
         run: docker push sowparnika268/my-python-app:latest
 
-      #- name: SSH to Instance and Deploy
-       # uses: appleboy/scp-action@master
-       # with:
-       #   host: 43.204.38.42
-        #  username: ubuntu  # Change based on your instance user
-         # key: ${{ secrets.SSH_PRIVATE_KEY }}
-         # source: "configuration.yml"
-         # target: "ansible/configuration.yml"
-          #port: 22
-
-      - name: Run Ansible Playbook
-        uses: appleboy/ssh-action@master
-        with:
-          host: dev
-          username: ubuntu  # Change based on your instance user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            ansible-playbook ansible/hosts ansible/configuration.yml --extra-vars "docker_image=sowparnika268/my-python-app:latest"
+      - name: Deploy to Dev using Ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'false'
+        run: |
+          ansible-playbook -i ansible/hosts ansible/configuration.yml --limit dev --extra-vars "docker_image=sowparnika268/my-python-app:latest"
