@@ -1,23 +1,28 @@
 - hosts: dev
   become: yes
   tasks:
+    - name: Install Docker
+      package:
+        name: docker
+        state: present
+
     - name: Pull Docker image
       docker_image:
-        name: sowparnika268/my-python-app:latest
+        name: "{{ docker_image }}"
         tag: latest
         source: pull
 
-    - name: Stop existing container
+    - name: Stop existing container if running
       docker_container:
         name: my-python-app
-        state: absent
+        state: stopped
+      when: ansible_facts['docker_containers'] | selectattr('Names', 'search', 'my-python-app') | list | length > 0
 
     - name: Run container
       docker_container:
         name: my-python-app
-        image: sowparnika268/my-python-app:latest
+        image: "{{ docker_image }}"
         state: started
         restart_policy: always
         published_ports:
           - "5000:5000"
-
