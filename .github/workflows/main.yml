@@ -34,7 +34,7 @@ jobs:
       - name: SSH to Instance and Deploy
         uses: appleboy/scp-action@master
         with:
-          host: ${{ 43.204.38.42 }}
+          host: 43.204.38.42
           username: ubuntu  # Change based on your instance user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "configuration.yml"
@@ -43,7 +43,7 @@ jobs:
       - name: Run Ansible Playbook
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ 43.204.38.42 }}
+          host: 43.204.38.42
           username: ubuntu  # Change based on your instance user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
