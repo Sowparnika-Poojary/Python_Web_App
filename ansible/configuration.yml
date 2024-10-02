@@ -1,62 +1,22 @@
 - hosts: dev
-  become: true
+  become: yes
   tasks:
-    - name: Ensure Docker is installed
-      apt:
-        name: docker.io
-        state: present
-
-    - name: Build Docker image
-      docker_image:
-        path: .
-        name: my-python-app
-        tag: latest
-
-    - name: Run Docker container on Dev
-      docker_container:
-        name: my-python-app-dev
-        image: my-python-app:latest
-        state: started
-        restart_policy: always
-
-- hosts: qa
-  become: true
-  tasks:
-    - name: Ensure Docker is installed
-      apt:
-        name: docker.io
-        state: present
-
     - name: Pull Docker image
       docker_image:
-        name: my-python-app
+        name: "{{ ecr_repository }}"
         tag: latest
         source: pull
 
-    - name: Run Docker container on QA
+    - name: Stop existing container
       docker_container:
-        name: my-python-app-qa
-        image: my-python-app:latest
-        state: started
-        restart_policy: always
-
-- hosts: prod
-  become: true
-  tasks:
-    - name: Ensure Docker is installed
-      apt:
-        name: docker.io
-        state: present
-
-    - name: Pull Docker image
-      docker_image:
         name: my-python-app
-        tag: latest
-        source: pull
+        state: absent
 
-    - name: Run Docker container on Prod
+    - name: Run container
       docker_container:
-        name: my-python-app-prod
-        image: my-python-app:latest
+        name: my-python-app
+        image: "{{ ecr_repository }}:latest"
         state: started
         restart_policy: always
+        published_ports:
+          - "5000:5000"
