@@ -1,43 +1,62 @@
-- name: Configure EC2 Instance and Deploy Docker Container
-  hosts: ec2
-  become: yes
-  vars:
-    docker_image: "my_web_app"  
-    docker_port: 5000  
-
+- hosts: dev
+  become: true
   tasks:
-    - name: Install necessary packages
+    - name: Ensure Docker is installed
       apt:
-        name: 
-          - python3-pip
-          - docker.io
+        name: docker.io
         state: present
-      when: ansible_os_family == "Debian"
 
-    - name: Install necessary packages
-      yum:
-        name: 
-          - python3-pip
-          - docker
-        state: present
-      when: ansible_os_family == "RedHat"
-
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
-    - name: Pull the Docker image
+    - name: Build Docker image
       docker_image:
-        name: "{{ docker_image }}"
+        path: .
+        name: my-python-app
+        tag: latest
+
+    - name: Run Docker container on Dev
+      docker_container:
+        name: my-python-app-dev
+        image: my-python-app:latest
+        state: started
+        restart_policy: always
+
+- hosts: qa
+  become: true
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Pull Docker image
+      docker_image:
+        name: my-python-app
         tag: latest
         source: pull
 
-    - name: Run the Docker container
+    - name: Run Docker container on QA
       docker_container:
-        name: my_web_app_container
-        image: "{{ docker_image }}"
+        name: my-python-app-qa
+        image: my-python-app:latest
         state: started
-        ports:
-          - "{{ docker_port }}:5000"  
+        restart_policy: always
+
+- hosts: prod
+  become: true
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Pull Docker image
+      docker_image:
+        name: my-python-app
+        tag: latest
+        source: pull
+
+    - name: Run Docker container on Prod
+      docker_container:
+        name: my-python-app-prod
+        image: my-python-app:latest
+        state: started
+        restart_policy: always
