@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Deploy to AWS
 
 on:
   push:
@@ -6,44 +6,45 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run tests
-        run: |
-          echo "Running tests..."
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build Docker image
         run: |
-          docker build -t my-python-app .
+          docker build -t ${{ secrets.ECR_REPOSITORY }} .
 
-      - name: Deploy to Dev using Ansible
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'false'
+      - name: Tag Docker image
         run: |
-          ansible-playbook -i ansible/hosts ansible/configuration.yml --limit dev
+          docker tag ${{ secrets.ECR_REPOSITORY }}:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
-      - name: Deploy to QA using Ansible
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'false'
+      - name: Push Docker image to ECR
         run: |
-          ansible-playbook -i ansible/hosts ansible/configuration.yml --limit qa
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
-      - name: Deploy to Prod using Ansible
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'false'
-        run: |
-          ansible-playbook -i ansible/hosts ansible/configuration.yml --limit prod
+      - name: SSH to Instance and Deploy
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ 43.204.38.42 }}
+          username: ubuntu  # Change based on your instance user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "configuration.yml"
+          target: "ansible/configuration.yml"
+
+      - name: Run Ansible Playbook
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ 43.204.38.42 }}
+          username: ubuntu  # Change based on your instance user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            ansible-playbook ansible/hosts ansible/configuration.yml --extra-vars "ecr_repository=${{ secrets.ECR_REPOSITORY }}"
