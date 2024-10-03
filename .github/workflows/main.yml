@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-            - name: Build and Deploy to Dev EC2
+      - name: Build and Deploy to Dev EC2
         uses: appleboy/ssh-action@master
         with:
           host: 3.108.61.107
