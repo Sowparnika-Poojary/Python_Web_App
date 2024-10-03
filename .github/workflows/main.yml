@@ -80,7 +80,7 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
 
             # Check if the container exists and remove it if it does
-            if [ $(docker ps -a -q -f name=my-python-app-container-prod) ]; then
+            if [ $(sudo docker ps -a -q -f name=my-python-app-container-prod) ]; then
               sudo docker stop my-python-app-container-prod
               sudo docker rm my-python-app-container-prod
             fi
