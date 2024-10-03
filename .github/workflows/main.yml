@@ -77,13 +77,13 @@ jobs:
             fi
 
             # Pull the latest Docker image on QA server
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
 
             # Check if the container exists and remove it if it does
             if [ $(docker ps -a -q -f name=my-python-app-container-prod) ]; then
-              docker stop my-python-app-container-prod
-              docker rm my-python-app-container-prod
+              sudo docker stop my-python-app-container-prod
+              sudo docker rm my-python-app-container-prod
             fi
 
             # Run the Docker container on QA server
-            docker run -d -p 80:5000 --name my-python-app-container-prod ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
+            sudo docker run -d -p 80:5000 --name my-python-app-container-prod ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
