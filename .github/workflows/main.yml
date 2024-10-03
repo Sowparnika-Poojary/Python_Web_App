@@ -37,17 +37,20 @@ jobs:
             # Pull latest changes
             git pull
             
-            # Build Docker image
-            docker build -t sowparnika268/my-python-app:latest .
+      - name: Build Docker image
+        run: docker build -t sowparnika268/my-python-app:latest .
 
-            #Push Docker image to Docker Hub
-            docker push sowparnika268/my-python-app:latest
+
+      - name: Push Docker image to Docker Hub
+        run: docker push sowparnika268/my-python-app:latest
+
             
-            # Stop and remove the existing container if it's running
-            if [ $(docker ps -q -f name=my-python-app) ]; then
+      - name: Stop and remove the existing container if it's running
+        run: |
+             if [ $(docker ps -q -f name=my-python-app) ]; then
               docker stop my-python-app
-              docker rm mypython-app
-            fi
-            
-            # Run the Docker container
-            docker run -d -p 80:80 --name my-python-app myapp:latest
+              docker rm my-python-app
+             fi
+
+      - name: Run the Docker container
+        run: docker run -d -p 80:80 --name my-python-app my-python-app:latest
