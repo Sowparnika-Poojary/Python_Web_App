@@ -36,6 +36,9 @@ jobs:
             
             # Pull latest changes
             git pull
+
+            # Remove old images with the same name and no tags
+            docker images --filter "reference=${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app" --filter "dangling=true" -q | xargs -r docker rmi
             
             # Build Docker image
             docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest .
