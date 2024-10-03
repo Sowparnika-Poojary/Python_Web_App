@@ -45,9 +45,7 @@ jobs:
 
       - name: Run the Docker container
         run: |
-            ssh -o StrictHostKeyChecking=no -i ${{secrets.SSH_PRIVATE_KEY}} ubuntu@3.108.61.107 << 'EOF'
               docker pull ${{secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
               docker stop my-python-app-container || true
               docker rm my-python-app-container || true
               docker run -d -p 80:80 --name my-python-app-container ${{secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
-            EOF
