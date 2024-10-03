@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and Deploy to Dev EC2
+            - name: Build and Deploy to Dev EC2
         uses: appleboy/ssh-action@master
         with:
           host: 3.108.61.107
@@ -37,15 +37,18 @@ jobs:
             # Pull latest changes
             git pull
             
-      - name: Build Docker image
-        run: docker build -t ${{secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest .
+            # Build Docker image
+            docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest .
 
-      - name: Push Docker image to Docker Hub
-        run:  docker push ${{secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
+            # Log in to Docker Hub
+            echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+            
+            # Push the Docker image to Docker Hub
+            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
 
-      - name: Run the Docker container
-        run: |
-              docker pull ${{secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
-              docker stop my-python-app-container || true
-              docker rm my-python-app-container || true
-              docker run -d -p 80:80 --name my-python-app-container ${{secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
+            # Stop and remove any existing container
+            docker stop my-python-app-container || true
+            docker rm my-python-app-container || true
+            
+            # Run the Docker container
+            docker run -d -p 80:80 --name my-python-app-container ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
