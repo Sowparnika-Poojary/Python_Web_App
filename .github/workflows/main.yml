@@ -22,7 +22,7 @@ jobs:
       - name: Build and Deploy to Dev EC2
         uses: appleboy/ssh-action@master
         with:
-          host: 13.235.23.71
+          host: ${{secrets.DEV_IP_ADDRESS}}
           username: ubuntu  # Change if needed
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
@@ -79,7 +79,7 @@ jobs:
       - name: Deploy to PROD EC2
         uses: appleboy/ssh-action@master
         with:
-          host: 13.201.71.84
+          host: ${{secrets.PROD_IP_ADDRESS}}
           username: ubuntu  # Change if needed
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
