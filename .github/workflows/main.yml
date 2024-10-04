@@ -84,15 +84,33 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Check if Docker is installed
-            if ! command -v docker &> /dev/null; then
-              echo "Docker not found, installing..."
-            # Install Docker directly using apt
+            if ! command -v git &> /dev/null; then
+              echo "Git not found, installing..."
               sudo apt-get update
-              sudo apt-get install -y docker.io
+              sudo apt-get install -y git
             else
-              echo "Docker is already installed."
+              echo "Git is already installed."
             fi
+          
+            # Navigate to the app directory or clone the repository if it doesn't exist
+            if [ ! -d "/home/ubuntu/my-python-app" ]; then
+              git clone https://github.com/Sowparnika-Poojary/Python_Web_App.git /home/ubuntu/my-python-app
+            fi
+            
+            cd /home/ubuntu/my-python-app
+            
+            # Pull latest changes
+            git pull
+
+            if ! command -v ansible &> /dev/null; then
+              echo "Ansible not found, installing..."
+              sudo apt-get update
+              sudo apt-get install -y ansible
+            else
+              echo "Ansible is already installed."
+            fi
+
+            ansible-playbook -i ansible/hosts, ansible/configuration.yml
 
             # Pull the latest Docker image on QA server
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest
