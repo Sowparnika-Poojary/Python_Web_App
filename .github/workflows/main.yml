@@ -79,7 +79,7 @@ jobs:
       - name: Deploy to PROD EC2
         uses: appleboy/ssh-action@master
         with:
-          host: 13.127.130.113
+          host: 13.201.71.84
           username: ubuntu  # Change if needed
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
