@@ -61,6 +61,9 @@ jobs:
             # Build Docker image
             docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest .
 
+            # Run tests in Docker
+            docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest pytest  # This will run your tests
+
             # Log in to Docker Hub
             echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
             
