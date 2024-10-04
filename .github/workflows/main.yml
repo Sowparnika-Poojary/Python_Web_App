@@ -22,11 +22,19 @@ jobs:
       - name: Build and Deploy to Dev EC2
         uses: appleboy/ssh-action@master
         with:
-          host: 3.108.61.107
+          host: 13.235.23.71
           username: ubuntu  # Change if needed
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            if ! command -v git &> /dev/null; then
+              echo "Git not found, installing..."
+              sudo apt-get update
+              sudo apt-get install -y git
+            else
+              echo "Git is already installed."
+            fi
+          
             # Navigate to the app directory or clone the repository if it doesn't exist
             if [ ! -d "/home/ubuntu/my-python-app" ]; then
               git clone https://github.com/Sowparnika-Poojary/Python_Web_App.git /home/ubuntu/my-python-app
@@ -36,6 +44,16 @@ jobs:
             
             # Pull latest changes
             git pull
+
+            if ! command -v ansible &> /dev/null; then
+              echo "Ansible not found, installing..."
+              sudo apt-get update
+              sudo apt-get install -y ansible
+            else
+              echo "Ansible is already installed."
+            fi
+
+            ansible-playbook -i ansible/hosts, ansible/configuration.yml
 
             # Remove old images with the same name and no tags
             docker images --filter "reference=${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app" --filter "dangling=true" -q | xargs -r docker rmi
