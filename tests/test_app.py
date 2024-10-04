@@ -13,4 +13,4 @@ def test_homepage(client):
     """Test the homepage of the Flask application."""
     response = client.get('/')  # Simulate a GET request to the homepage
     assert response.status_code == 200  # Check if the response status is 200 OK
-    assert b"Welcome to my web app!" in response.data  # Check the response content
+    assert b"Welcome to IQVIA!" in response.data  # Check the response content
