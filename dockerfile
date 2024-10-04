@@ -16,8 +16,8 @@ COPY . .
 # Stage for testing
 FROM builder AS tester
 
-# Install pytest for testing
-RUN pip install pytest
+# Set PYTHONPATH to the current working directory
+ENV PYTHONPATH=/app
 
 # Run the tests
 RUN pytest  # This will execute your tests
