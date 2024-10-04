@@ -28,8 +28,11 @@ FROM python:3.9-slim AS final
 # Set the working directory
 WORKDIR /app
 
-# Copy from the builder stage
+# Copy only the necessary files from the builder stage
 COPY --from=builder /app /app
+
+# Ensure Flask and other dependencies are installed in the final image
+COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 
 # Expose the desired port
 EXPOSE 5000
