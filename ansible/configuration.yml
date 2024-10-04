@@ -1,28 +1,41 @@
 - hosts: dev
   become: yes
   tasks:
-    - name: Ensure Docker is installed
+     - name: Update apt package index
+      apt:
+        update_cache: yes
+
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_installed
+      ignore_errors: yes
+
+    - name: Install Docker if not installed
       apt:
         name: docker.io
         state: present
+      when: docker_installed is failed
 
-    - name: Pull Docker image
-      docker_image:
-        name: "{{ docker_image }}"
-        tag: latest
-        source: pull
+    - name: Check if Git is installed
+      command: git --version
+      register: git_installed
+      ignore_errors: yes
 
-    - name: Stop existing container if running
-      docker_container:
-        name: my-python-app
-        state: stopped
-      when: ansible_facts['docker_containers'] | selectattr('Names', 'search', 'my-python-app') | list | length > 0
+    - name: Install Git if not installed
+      apt:
+        name: git
+        state: present
+      when: git_installed is failed
 
-    - name: Run container
-      docker_container:
-        name: my-python-app
-        image: "{{ docker_image }}"
-        state: started
-        restart_policy: always
-        published_ports:
-          - "5000:5000"
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+
+    - name: Verify Git installation
+      command: git --version
+      register: git_version
+    
+    - debug:
+        msg: 
+          - "Docker version: {{ docker_version.stdout }}"
+          - "Git version: {{ git_version.stdout }}"
