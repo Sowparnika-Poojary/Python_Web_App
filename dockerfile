@@ -19,7 +19,7 @@ FROM builder AS tester
 # Set PYTHONPATH to the current working directory
 ENV PYTHONPATH=/app
 
-# Run the tests
+# Run the tests (make sure pytest is installed in requirements.txt)
 RUN pytest  # This will execute your tests
 
 # Final image for running the application
