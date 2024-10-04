@@ -5,24 +5,24 @@
        apt:
          update_cache: yes
 
-    - name: Check if Docker is installed
-      command: docker --version
-      register: docker_installed
-      ignore_errors: yes
+     - name: Check if Docker is installed
+       command: docker --version
+       register: docker_installed
+       ignore_errors: yes
 
-    - name: Install Docker if not installed
-      apt:
-        name: docker.io
-        state: present
-      when: docker_installed is failed
+     - name: Install Docker if not installed
+       apt:
+         name: docker.io
+         state: present
+       when: docker_installed is failed
 
-    - name: Verify Docker installation
-      command: docker --version
-      register: docker_version
+     - name: Verify Docker installation
+       command: docker --version
+       register: docker_version
     
-    - debug:
-        msg: 
-          - "Docker version: {{ docker_version.stdout }}"
+     - debug:
+         msg: 
+           - "Docker version: {{ docker_version.stdout }}"
 
 - hosts: prod
   become: yes
@@ -31,21 +31,21 @@
        apt:
          update_cache: yes
 
-    - name: Check if Docker is installed
-      command: docker --version
-      register: docker_installed
-      ignore_errors: yes
+     - name: Check if Docker is installed
+       command: docker --version
+       register: docker_installed
+       ignore_errors: yes
 
-    - name: Install Docker if not installed
-      apt:
-        name: docker.io
-        state: present
-      when: docker_installed is failed
+     - name: Install Docker if not installed
+       apt:
+         name: docker.io
+         state: present
+       when: docker_installed is failed
 
-    - name: Verify Docker installation
-      command: docker --version
-      register: docker_version
+     - name: Verify Docker installation
+       command: docker --version
+       register: docker_version
     
-    - debug:
-        msg: 
-          - "Docker version: {{ docker_version.stdout }}"
+     - debug:
+         msg: 
+           - "Docker version: {{ docker_version.stdout }}"
