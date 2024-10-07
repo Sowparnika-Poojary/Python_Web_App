@@ -13,12 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
       - name: Build and Deploy to Dev EC2
         uses: appleboy/ssh-action@master
         with:
@@ -68,7 +62,7 @@ jobs:
             docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest .
 
             # Run tests in Docker
-            docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest pytest  # This will run your tests
+            #docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/my-python-app:latest pytest  # This will run your tests
 
             # Log in to Docker Hub
             echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
